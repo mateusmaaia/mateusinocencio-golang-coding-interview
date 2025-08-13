@@ -11,6 +11,7 @@ import (
 	"github.com/BEON-Tech-Studio/golang-live-coding-challenge/internal/models"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetStatesJson_Success(t *testing.T) {
@@ -22,7 +23,6 @@ func TestGetStatesJson_Success(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	err := getStatesJson(c)
-
 	if err != nil {
 		// If external API is not available, skip this test
 		t.Skip("External API not available:", err.Error())

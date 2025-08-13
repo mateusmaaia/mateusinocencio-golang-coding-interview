@@ -22,12 +22,22 @@ func home(c echo.Context) error {
 func getStates(c echo.Context) error {
 	var states []models.State
 
-	result := db.Find(&states)
+	result := db.Table("states").Find(&states)
 	if result.RowsAffected == 0 {
 		statesData, err := FetchStates()
 		if err != nil {
-			return err
+			// %w will pass the error value to the caller which means if you use error.Is/error.As you can check the error type
+			return fmt.Errorf("failed to fetch states: %w", err)
 		}
+
+		// Save the fetched states to the database
+		if len(statesData.States) > 0 {
+			result := db.Create(&statesData.States)
+			if result.Error != nil {
+				return fmt.Errorf("failed to save states to database: %w", result.Error)
+			}
+		}
+
 		states = statesData.States
 	}
 
@@ -39,24 +49,52 @@ func getStates(c echo.Context) error {
 }
 
 func getStatesJson(c echo.Context) error {
-	statesData, err := FetchStates()
+	var states []models.State
+	result := db.Table("states").Find(&states)
+	if result.RowsAffected == 0 {
+		statesData, err := FetchStates()
+		if err != nil {
+			// %w will pass the error value to the caller which means if you use error.Is/error.As you can check the error type
+			return fmt.Errorf("failed to fetch states: %w", err)
+		}
+
+		// Save the fetched states to the database
+		if len(statesData.States) > 0 {
+			result := db.Create(&statesData.States)
+			if result.Error != nil {
+				return fmt.Errorf("failed to save states to database: %w", result.Error)
+			}
+		}
+
+		states = statesData.States
+	}
+
+	return c.JSON(http.StatusOK, states)
+}
+
+func getStateByCode(c echo.Context) error {
+	codeID := c.Param("code")
+
+	var state models.State
+	result := db.First(&state, "code = ?", codeID)
+	if result.Error != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "State not found"})
+	}
+
+	return c.JSON(http.StatusOK, state)
+}
+
+func getReports(c echo.Context) error {
+	reports, err := FetchReports()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to fetch reports") // api should not know internal error // add a error wrapper
 	}
 
-	if err := c.Bind(statesData.States); err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, statesData.States)
+	return c.JSON(http.StatusOK, reports)
 }
 
 func getCategoriesJson(c echo.Context) error {
 	var categories []models.Category
-
-	if err := c.Bind(categories); err != nil {
-		return err
-	}
 
 	return c.JSON(http.StatusOK, categories)
 }
