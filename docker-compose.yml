@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/app.dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/golang-live-coding-challenge
+    depends_on:
+      - database
+    container_name: golang-docker-server
+    networks:
+      - golang-live-coding
+
+  database:
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: ./docker/db.dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: golang_coding_interview
+    container_name: golang-docker-db
+    ports:
+      - 33066:3306
+    volumes:
+      - golang-live-coding-challenge-data:/var/lib/mysql
+    networks:
+      - golang-live-coding
+
+networks:
+  golang-live-coding:
+    driver: bridge
+# persisted storage
+volumes:
+  golang-live-coding-challenge-data:

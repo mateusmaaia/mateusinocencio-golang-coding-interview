@@ -1,0 +1,23 @@
+{{define "row"}}
+	<tr>
+		<td>{{.ID}}</td>
+		<td>{{.Code}}</td>
+		<td>{{.Name}}</td>
+	</tr>
+{{end}}
+<table>
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>Code</th>
+			<th>Name</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{range .states}} 
+			{{template "row" .}}
+		{{else}} 
+			{{template "empty"}}
+		{{end}}
+	</tbody>
+</table>

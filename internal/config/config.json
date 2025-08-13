@@ -1,0 +1,10 @@
+{
+    "port": 8080,
+    "api-key": "w8QSevakdDRTZvL4RHNmiAonaXBSI0KnScUj4uRY",
+    "db": {
+        "username": "admin",
+        "password": "123456",
+        "dbhost": "database:3306",
+        "dbname": "golang_coding_interview"
+    }
+}
